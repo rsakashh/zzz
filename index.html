@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>রমজান সময়সূচি</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Noto Sans Bengali',sans-serif;background:#0c4f83;color:#1b2b3a;transition:background 0.5s;}
+.header{background:#0c4f83;color:#fff;text-align:center;padding:25px 10px;position:sticky;top:0;z-index:1000}
+.header h1{margin:0;font-size:40px;font-weight:700}
+.container{max-width:1100px;margin:20px auto;background:#fff;border-radius:20px;padding:20px;box-shadow:0 10px 25px rgba(0,0,0,.15)}
+.title{text-align:center;color:#0c4f83}
+.subtitle{text-align:center;color:#444;margin-bottom:20px}
+.table-wrap{overflow:auto; max-height:500px;}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px;border:1px solid #ddd;text-align:center}
+th{background:#0c4f83;color:#fff;position:sticky;top:0}
+tr:nth-child(even){background:#f3f6f9}
+.highlight{background:#ffe7a3 !important;font-weight:700;transition:background 1s;}
+#countdown,#sehriCountdown{margin-top:10px;font-size:22px;font-weight:600;color:#0c4f83;text-align:center}
+select{padding:8px 12px;border-radius:8px;border:1px solid #ccc}
+.footer{text-align:center;background:#0c4f83;color:#fff;padding:20px;margin-top:20px;border-radius:0 0 20px 20px}
+.footer a{color:#ffe7a3;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="header"><h1>রমাদান মুবারক</h1></div>
+<div class="container">
+  <h2 class="title">সেহরি ও ইফতারের সময়সূচি</h2>
+  <p class="subtitle">১৪৪৭ হিজরি | ২০২৬ খ্রিষ্টাব্দ</p>
+  <div style="text-align:center;margin-bottom:15px">
+    <select id="location">
+      <option value="dhaka">ঢাকা</option>
+      <option value="chuadanga">চুয়াডাঙ্গা</option>
+    </select>
+  </div>
+  <div id="countdown">ইফতার কাউন্টডাউন: --:--:--</div>
+  <div id="sehriCountdown">সেহরি কাউন্টডাউন: --:--:--</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>রোজা</th><th>তারিখ</th><th>বার</th><th>সেহরি শেষ</th><th>ইফতার</th></tr>
+      </thead>
+      <tbody id="schedule"></tbody>
+    </table>
+  </div>
+</div>
+<div class="footer">
+  <p>প্রদত্ত রোজার সময়সূচি © ২০২৬ | <a href="#">Private Policy</a> | Contact: rsa.akash@yahoo.com</p>
+</div>
+
+<script>
+// রোজার সূচি: 1 রোজা = 19 ফেব্রুয়ারি ২০২৬
+const schedules = {
+  dhaka: [
+    ["01","১৯ ফেব্রুয়ারি","বৃহস্পতিবার","৫:১২","৫:৫৮"],["02","২০ ফেব্রুয়ারি","শুক্রবার","৫:১১","৫:৫৯"],
+    ["03","২১ ফেব্রুয়ারি","শনিবার","৫:১০","৬:০০"],["04","২২ ফেব্রুয়ারি","রবিবার","৫:০৯","৬:০০"],
+    ["05","২৩ ফেব্রুয়ারি","সোমবার","৫:০৮","৬:০১"],["06","২৪ ফেব্রুয়ারি","মঙ্গলবার","৫:০৭","৬:০২"],
+    ["07","২৫ ফেব্রুয়ারি","বুধবার","৫:০৬","৬:০২"],["08","২৬ ফেব্রুয়ারি","বৃহস্পতিবার","৫:০৫","৬:০৩"],
+    ["09","২৭ ফেব্রুয়ারি","শুক্রবার","৫:০৪","৬:০৪"],["10","২৮ ফেব্রুয়ারি","শনিবার","৫:০৩","৬:০৪"],
+    ["11","২৯ ফেব্রুয়ারি","রবিবার","৫:০২","৬:০৫"],["12","১ মার্চ","সোমবার","৫:০১","৬:০৬"],
+    ["13","২ মার্চ","মঙ্গলবার","৫:০০","৬:০৬"],["14","৩ মার্চ","বুধবার","৪:৫৯","৬:০৭"],
+    ["15","৪ মার্চ","বৃহস্পতিবার","৪:৫৮","৬:০৮"],["16","৫ মার্চ","শুক্রবার","৪:৫৭","৬:০৮"],
+    ["17","৬ মার্চ","শনিবার","৪:৫৬","৬:০৯"],["18","৭ মার্চ","রবিবার","৪:৫৫","৬:১০"],
+    ["19","৮ মার্চ","সোমবার","৪:৫৪","৬:১০"],["20","৯ মার্চ","মঙ্গলবার","৪:৫৩","৬:১১"],
+    ["21","১০ মার্চ","বুধবার","৪:৫২","৬:১২"],["22","১১ মার্চ","বৃহস্পতিবার","৪:৫১","৬:১২"],
+    ["23","১২ মার্চ","শুক্রবার","৪:৫০","৬:১৩"],["24","১৩ মার্চ","শনিবার","৪:৪৯","৬:১৪"],
+    ["25","১৪ মার্চ","রবিবার","৪:৪৮","৬:১৪"],["26","১৫ মার্চ","সোমবার","৪:৪৭","৬:১৫"],
+    ["27","১৬ মার্চ","মঙ্গলবার","৪:৪৬","৬:১৬"],["28","১৭ মার্চ","বুধবার","৪:৪৫","৬:১৬"],
+    ["29","১৮ মার্চ","বৃহস্পতিবার","৪:৪৪","৬:১৭"],["30","১৯ মার্চ","শুক্রবার","৪:৪৩","৬:১৮"]
+  ],
+  chuadanga: [
+    ["01","১৯ ফেব্রুয়ারি","বৃহস্পতিবার","৫:১৫","৬:০১"],["02","২০ ফেব্রুয়ারি","শুক্রবার","৫:১৪","৬:০২"],
+    ["03","২১ ফেব্রুয়ারি","শনিবার","৫:১৩","৬:০৩"],["04","২২ ফেব্রুয়ারি","রবিবার","৫:১২","৬:০৩"],
+    ["05","২৩ ফেব্রুয়ারি","সোমবার","৫:১১","৬:০৪"],["06","২৪ ফেব্রুয়ারি","মঙ্গলবার","৫:১০","৬:০৫"],
+    ["07","২৫ ফেব্রুয়ারি","বুধবার","৫:০৯","৬:০৫"],["08","২৬ ফেব্রুয়ারি","বৃহস্পতিবার","৫:০৮","৬:০৬"],
+    ["09","২৭ ফেব্রুয়ারি","শুক্রবার","৫:০৭","৬:০৭"],["10","২৮ ফেব্রুয়ারি","শনিবার","৫:০৬","৬:০৭"],
+    ["11","২৯ ফেব্রুয়ারি","রবিবার","৫:০৫","৬:০৮"],["12","১ মার্চ","সোমবার","৫:০৪","৬:০৯"],
+    ["13","২ মার্চ","মঙ্গলবার","৫:০৩","৬:০৯"],["14","৩ মার্চ","বুধবার","৫:০২","৬:১০"],
+    ["15","৪ মার্চ","বৃহস্পতিবার","৫:০১","৬:১১"],["16","৫ মার্চ","শুক্রবার","৫:০০","৬:১১"],
+    ["17","৬ মার্চ","শনিবার","৪:৫৯","৬:১২"],["18","৭ মার্চ","রবিবার","৪:৫৮","৬:১৩"],
+    ["19","৮ মার্চ","সোমবার","৪:৫৭","৬:১৩"],["20","৯ মার্চ","মঙ্গলবার","৪:৫৬","৬:১৪"],
+    ["21","১০ মার্চ","বুধবার","৪:৫৫","৬:১৫"],["22","১১ মার্চ","বৃহস্পতিবার","৪:৫৪","৬:১৫"],
+    ["23","১২ মার্চ","শুক্রবার","৪:৫৩","৬:১৬"],["24","১৩ মার্চ","শনিবার","৪:৫২","৬:১৭"],
+    ["25","১৪ মার্চ","রবিবার","৪:৫১","৬:১৭"],["26","১৫ মার্চ","সোমবার","৪:৫০","৬:১৮"],
+    ["27","১৬ মার্চ","মঙ্গলবার","৪:৪৯","৬:১৯"],["28","১৭ মার্চ","বুধবার","৪:৪৮","৬:১৯"],
+    ["29","১৮ মার্চ","বৃহস্পতিবার","৪:৪৭","৬:২০"],["30","১৯ মার্চ","শুক্রবার","৪:৪৬","৬:২১"]
+  ]
+};
+
+// অন্যান্য function আগের মতোই
+function bnToEn(str){const map={'০':0,'১':1,'২':2,'৩':3,'৪':4,'৫':5,'৬':6,'৭':7,'৮':8,'৯':9};return str.replace(/[০-৯]/g,d=>map[d]);}
+function formatTime12(time,isIftar=false){let [h,m]=bnToEn(time).split(':').map(Number);let period=isIftar?'PM':'AM';if(!isIftar&&h===0) h=12;return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')} ${period}`;}
+function time12to24(time12){let [time,period]=time12.split(' ');let [h,m]=time.split(':').map(Number);if(period==='PM'&&h<12)h+=12;if(period==='AM'&&h===12)h=0;return {h,m};}
+function render(loc){const tbody=document.getElementById('schedule');tbody.innerHTML='';schedules[loc].forEach(r=>{const tr=document.createElement('tr');r.forEach((c,i)=>{const td=document.createElement('td');td.textContent=(i===3)?formatTime12(c,false):(i===4)?formatTime12(c,true):c;tr.appendChild(td);});tbody.appendChild(tr);});highlightNext();}
+function highlightNext(){const now=new Date();let highlighted=false;document.querySelectorAll('#schedule tr').forEach(row=>{row.classList.remove('highlight');if(highlighted) return;const sehri=row.children[3].innerText;const iftar=row.children[4].innerText;const {h:sh,m:sm}=time12to24(sehri);const {h:ih,m:im}=time12to24(iftar);const nowH=now.getHours(),nowM=now.getMinutes();if(nowH<sh||(nowH===sh&&nowM<sm)){row.classList.add('highlight');highlighted=true;}else if(nowH<ih||(nowH===ih&&nowM<im)){row.classList.add('highlight');highlighted=true;}});}
+function calcDiff(time12){const now=new Date();const {h,m}=time12to24(time12);const target=new Date();target.setHours(h,m,0,0);if(target<now)target.setDate(target.getDate()+1);const diff=target-now;const hh=String(Math.floor(diff/3600000)).padStart(2,'0');const mm=String(Math.floor((diff%3600000)/60000)).padStart(2,'0');const ss=String(Math.floor((diff%60000)/1000)).padStart(2,'0');return {hh,mm,ss};}
+function startCountdown(){setInterval(()=>{const row=document.querySelector('#schedule tr.highlight');if(!row)return;const sehri=row.children[3].innerText;const iftar=row.children[4].innerText;const {hh:shh,mm:smm,ss:sss}=calcDiff(sehri);const {hh:ihh,mm:imm,ss:iss}=calcDiff(iftar);document.getElementById('sehriCountdown').innerText=`সেহরি কাউন্টডাউন: ${shh}:${smm}:${sss}`;document.getElementById('countdown').innerText=`ইফতার কাউন্টডাউন: ${ihh}:${imm}:${iss}`;row.style.backgroundColor=`rgba(255,231,163,${1-iss/60})`;},1000);}
+render('dhaka');document.getElementById('location').addEventListener('change',e=>render(e.target.value));startCountdown();
+</script>
+</body>
+</html>
